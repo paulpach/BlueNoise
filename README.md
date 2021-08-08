@@ -38,13 +38,15 @@ Long story short: Dr. Roberts calculates what he calls "balanced permutations", 
 
 ## Balanced sequences
 
-Instead of balanced permutations I build "balanced sequences".   
+Instead of balanced permutations I build "balanced sequences". 
 A balanced sequence is an "infinite" sequence of numbers `s(i)` such that `0 <= s(i) < n` and `|s(i+1) - s(i)| <= n / 2`
 A balanced sequence is pseudorandom, with no discernible pattern.
 A balanced sequence is repeatable,  meaning that if I evaluate `s(i)` more than once, I get the same result.
 A balanced sequence can be evaluated at any random point `s(i)` without having to evaluate all previous values, this is in contrast to `rand()` and most other pseudo random number generators.
 
-By "infinite" I mean that it covers the full range of possible values,  if using int, that means 2^32 possible values.  This can be easily extended to 64 bits values or more, provided a suitable noise function.
+By "infinite" I mean that the sequence is limited only by the limits of the data types. 
+If using 32 bit integers, that means the sequence has 2^32 numbers.  
+This can be easily extended to 64 bits values or more, provided a suitable noise function.
 
 For example,  if n = 8, a valid portion of a balanced sequence would be:
 ```..., 0, 4, 3, 7, 6, 3, 2, 5, 6, ...```
