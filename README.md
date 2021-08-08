@@ -65,7 +65,7 @@ To evaluate s(i):
     2. calculate the range of numbers that are in range of both values
     3. pick one randomly using [Squirrel3](https://www.youtube.com/watch?v=LWFzPP8ZbdU)
 
-Note that any other noise function would work just fine.
+Note that any other noise function instead of Squirrel3 would work just fine.
 
 Here is the implementation of my [BalancedSequence](BlueNoiseSampler.cs#L61)
 
@@ -76,7 +76,7 @@ Here is my implementation of [Squirrel3](SquirrelNoise.cs)
 When calculating the value for a cell at (x,y):
 1. I calculate the row and column by dividing by the cell size (I use bit shift since my cell sizes are powers of 2)
 2. I sample s1(row) and s2(col),  
-3. I get the location of the sample within the cell using s1(row) and s2(col)
+3. I get the canonical grid layout cell using s1(row) and s2(col)
 
 
 
