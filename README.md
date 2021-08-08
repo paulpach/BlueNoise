@@ -16,6 +16,7 @@ Besides the features described in the [original article](http://extremelearning.
 * O(1) very fast sampling of any arbitrary cell, no need to evaluate neighbor cells
 * only integer math is required
 * No divisions, only bit shifts. I achieve this by restricting cell sizes to powers of 2
+* Seeded. Each seed produces different samples
 
 You can find the algorithm in [BlueNoiseSampler.cs](BlueNoiseSampler.cs)
 
