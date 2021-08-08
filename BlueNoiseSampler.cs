@@ -98,9 +98,10 @@ public readonly struct BlueNoiseSampler
     public (int, int) this [int x, int y]
     {
         get {            
-            int frequency = 1 << Bits;
-            int mask = ~(frequency - 1);
+            int cellSize = 1 << Bits;
+            int mask = ~(cellSize - 1);
 
+            // this is the bottom left origin of the cell where (x,y) is
             int x0 = x & mask;
             int y0 = y & mask;
 
@@ -110,7 +111,7 @@ public readonly struct BlueNoiseSampler
 
             // pick a row and column from the cannonical grid layout
             // as described in the original article
-            return (x0 + rndRow, y0 + frequency - rndColumn - 1);
+            return (x0 + rndRow, y0 + cellSize - rndColumn - 1);
         }
     }
 
