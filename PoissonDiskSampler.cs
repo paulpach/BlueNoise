@@ -93,17 +93,17 @@ public readonly struct PoissonDiskSampler
             }
             else if ((row & 1) == 0 && (col & 1) == 1) {
                 // even row, odd column
-
                 sample = GetEvenRowSample(col, row);
-            }
+            } 
             else if ((row & 1) == 1 && (col & 1) == 0) {
+                // odd row, even column
                 sample = GetEvenColSample(col, row);
             }
             else
             {
+                // odd row, odd column
                 sample = GetEvenRowEvenColSample(col, row);
             }
-
             sample.X += x0;
             sample.Y += y0;
             return sample;
@@ -124,26 +124,34 @@ public readonly struct PoissonDiskSampler
     private Sample GetRowAdjustedSample(int col, int row, Sample s0, Sample s1)
     {
         int cellSize = 1 << Bits;
-        int cellEnd = cellSize - 1;
+        int halfCell = cellSize >> 1;
+        int mask = cellSize - 1;
 
-        // generate a new sample for this cell and adjust it
-        // for the neighbor cells
-        // both neightbors are on the same row
-        Sample result = GenerateCandidate(col, row);
+        // every even cell will be colored with white or black and will alternate
+        // That means that only one of s0 and s1 will be black
+        // this variable determines which one it is
+        bool prevIsWhite = ((row ^ col) & 2) == 0; 
+        Sample whiteSample = prevIsWhite ? s0 : s1;
 
-        // invalidate sample if it does not fit
-        if (s0.X >= s1.X)
-            result.Value = 0;
-        else
-            result.X = Lerp(s0.X, s1.X, result.X);
+        Sample blackSample = prevIsWhite ? s1 : s0;
+
+        // get the y value from the black one one:
+        int y = prevIsWhite ? (int)blackSample.Value & mask : ((int)blackSample.Value >> Bits) & mask;
 
 
-        int yprev = (int)(s0.Value & cellEnd);
-        int ynext = cellEnd  - (int)(s1.Value & cellEnd);
+        // get the y values from the black one:
+        int x1 = (int)(whiteSample.Value & mask);
+        int x2 = (int)((whiteSample.Value >> Bits) & mask);
 
-        result.Y = Lerp(yprev, ynext, result.X);
+        int x = prevIsWhite ? Math.Min(x1, x2) : Math.Max(x1,x2);
 
-        return result;
+        bool valid = x >= s0.X && x <= s1.X;
+
+        return new Sample {
+            X = x,
+            Y = y,
+            Value = valid ? 1u : 0u
+        };
     }
 
     private Sample GetEvenColSample(int col, int row)
@@ -160,25 +168,31 @@ public readonly struct PoissonDiskSampler
     {
         int cellSize = 1 << Bits;
         int halfCell = cellSize >> 1;
-        int cellEnd = cellSize - 1;
+        int mask = cellSize - 1;
 
-        // generate a new sample for this cell and adjust it
-        // for the neighbor cells
-        // both neightbors are on the same column
-        Sample result = GenerateCandidate(col, row);
-        
-        // invalidate sample if it does not fit
-        if (s0.Y >= s1.Y)
-            result.Value = 0;
-        else
-            result.Y = Lerp(s0.Y, s1.Y, result.Y);
+        // every even cell will be colored with white or black and will alternate
+        // That means that only one of s0 and s1 will be black
+        // this variable determines which one it is
+        bool prevIsWhite = ((row ^ col) & 2) == 0; 
 
-        int xprev = cellEnd  - (int)(s0.Value & cellEnd);
-        int xnext = (int)(s1.Value & cellEnd);
+        // get the x value from the white one:
+        int x = prevIsWhite ? (int)s0.Value & mask : ((int)s1.Value >> Bits) & mask;
 
-        result.X = Lerp(xprev, xnext, result.Y);
+        Sample blackSample = prevIsWhite ? s1 : s0;
 
-        return result;
+        // get the y values from the black one:
+        int y1 = (int)(blackSample.Value & mask);
+        int y2 = (int)((blackSample.Value >> Bits) & mask);
+
+        int y = prevIsWhite ? Math.Min(y1, y2) : Math.Max(y1,y2);
+
+        bool valid = y >= s0.Y && y <= s1.Y;
+
+        return new Sample {
+            X = x,
+            Y = y,
+            Value = valid ? 1u : 0u
+        };
     }
 
     private Sample GetEvenRowEvenColSample(int col, int row)
@@ -204,39 +218,64 @@ public readonly struct PoissonDiskSampler
         int maxx = middleRight.Valid ? middleRight.X : cellSize - 1;
         int maxy = upperMiddle.Valid ? upperMiddle.Y : cellSize - 1;
 
-        // also take into account corners, just in case they are close to the center
-        if (ll.Y > halfCell)
-            minx = Math.Max(minx, ll.X);
-        if (ul.Y <= halfCell)
-            minx = Math.Max(minx, ul.X);
-        if (lr.Y > halfCell)
-            maxx = Math.Min(maxx, lr.X);
-        if (ur.Y <= halfCell)
-            maxx = Math.Min(maxx, ur.X);
-        
-        if (ll.X > halfCell)
-            miny = Math.Max(miny, ll.Y);
-        if (ul.X <= halfCell)
-            miny = Math.Max(miny, ul.Y);
-        if (lr.X > halfCell)
-            maxy = Math.Min(maxy, lr.Y);
-        if (ur.X <= halfCell)
-            maxy = Math.Min(maxy, ur.Y);
-
-        // generate a new sample for this cell and adjust it
-        // for the neighbor cells
-        Sample result = GenerateCandidate(col, row);    
-
-        // invalidate sample if it does not fit
-        if (miny >= maxy || minx >= maxx)
-            result.Value = 0;
-        else
-        {
-            result.X = Lerp(minx, maxx, result.X);
-            result.Y = Lerp(miny, maxy, result.X);            
+        // no where to put the sample
+        if (minx > maxx || miny > maxy) {
+            return new Sample{ X = 0, Y = 0, Value = 0 };
         }
 
-        return result;
-    }
+
+        Sample sample = GenerateCandidate(col, row);
+
+        // (x,y) do not interfere with the sides
+        int x = Lerp(minx, maxx, sample.X);
+        int y = Lerp(miny, maxy, sample.Y);
+        
+        int conflictMinx = minx;
+        int conflictMaxx = maxx;
+        int conflictMiny = miny;
+        int conflictMaxy = maxy;
+
+        if (x < ll.X)
+            conflictMiny = Math.Max(conflictMiny, ll.Y);
+        if (x < ul.X)
+            conflictMaxy = Math.Min(conflictMaxy, ul.Y);
+        if (x > lr.X)
+            conflictMiny = Math.Max(conflictMiny, lr.Y);
+        if (x > ur.X)
+            conflictMaxy = Math.Min(conflictMaxy, ur.Y);
+
+        if (y < ll.Y)
+            conflictMinx = Math.Max(conflictMinx, ll.X);
+        if (y < lr.Y)
+            conflictMaxx = Math.Min(conflictMaxx, lr.X);
+        if (y > ul.Y)
+            conflictMinx = Math.Max(conflictMinx, ul.X);
+        if (y > ur.Y)
+            conflictMaxx = Math.Min(conflictMaxx, ur.X);
+
+        // find out conflicts
+        bool llConflict = ll.X > x && ll.Y > y;
+        bool ulConflict = ul.X > x && ul.Y < y;
+        bool lrConflict = lr.X < x && lr.Y > y;
+        bool urConflict = ur.X < x && ur.Y < y;
+
+        if (llConflict || ulConflict || lrConflict || urConflict) {
+            // can we solve the conflict by moving in X or Y direction?
+            if (conflictMinx > conflictMaxx && conflictMiny > conflictMaxy) {
+                return new Sample { X = 0, Y = 0, Value = 0 };
+            }
+
+            // shift only x or y to solve the conflict,  never both
+            if (conflictMaxx - conflictMinx > conflictMaxy - conflictMiny) {
+                x = Lerp(conflictMinx, conflictMaxx, sample.X);
+            }
+            else {
+                y = Lerp(conflictMiny, conflictMaxy, sample.Y);
+            }
+
+        }
+
+        return new Sample{ X = x, Y = y, Value = 1 };
+   }
 
 }
