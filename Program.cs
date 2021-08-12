@@ -15,6 +15,14 @@ namespace BlueNoise
             {
                 RunPoissonDisk();
             }
+            else if (args[0] == "--poisson2")
+            {
+                RunPoissonDisk2();
+            }
+            else if (args[0] == "--poisson3")
+            {
+                RunPoissonDisk3();
+            }
         }
 
         private static void RunBlueNoiseSampler()
@@ -44,6 +52,54 @@ namespace BlueNoise
             int cellSize = 1 << bits;
 
             PoissonDiskSampler sampler = new PoissonDiskSampler(bits, 0);
+
+            int gridSize = 30;
+
+            for (int x = 0; x < gridSize * cellSize; x += cellSize)
+            {
+                for (int y = 0; y < gridSize * cellSize; y += cellSize)
+                {
+
+                    var sample = sampler[x, y];
+
+                    int row = x >> bits;
+                    int col = y >> bits;
+
+                    if (sample.Valid )
+                        Console.WriteLine($"{sample.X}, {sample.Y}");
+                }
+            }
+        }
+        private static void RunPoissonDisk2()
+        {
+            int bits = 8;
+            int cellSize = 1 << bits;
+
+            PoissonDiskSampler2 sampler = new PoissonDiskSampler2(bits, 0);
+
+            int gridSize = 30;
+
+            for (int x = 0; x < gridSize * cellSize; x += cellSize)
+            {
+                for (int y = 0; y < gridSize * cellSize; y += cellSize)
+                {
+
+                    var sample = sampler[x, y];
+
+                    int row = x >> bits;
+                    int col = y >> bits;
+
+                    if (sample.Valid )
+                        Console.WriteLine($"{sample.X}, {sample.Y}");
+                }
+            }
+        }
+        private static void RunPoissonDisk3()
+        {
+            int bits = 8;
+            int cellSize = 1 << bits;
+
+            PoissonDiskSampler3 sampler = new PoissonDiskSampler3(bits, 0);
 
             int gridSize = 30;
 
