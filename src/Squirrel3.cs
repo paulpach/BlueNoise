@@ -7,14 +7,14 @@
 /// Squirrel noise as described in:
 /// https://www.youtube.com/watch?v=LWFzPP8ZbdU&t=2021s
 /// </remarks>
- public readonly struct SquirrelNoise
+ public readonly struct Squirrel3
     {
         private readonly uint seed;
 
         /// <summary>
         /// Initializes the noise generator with a seed.
         /// </summary>
-        public SquirrelNoise(uint seed)
+        public Squirrel3(uint seed)
         {
             this.seed = seed;
         }

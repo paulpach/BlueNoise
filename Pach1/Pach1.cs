@@ -10,10 +10,10 @@ using System;
 ///   without calculating neighbors.
 ///   Requires no storage or initial computations.
 /// </remarks>
-public readonly struct BlueNoiseSampler
+public readonly struct Pach1
 {
     /// Repeatable random number generator
-    private readonly SquirrelNoise Noise;
+    private readonly Squirrel3 Noise;
 
     /// the cell size will be 2 ^ bits
     private readonly int Bits;
@@ -27,9 +27,9 @@ public readonly struct BlueNoiseSampler
     ///   Different seeds produce different samples
     /// </param>
     /// <param name="width">
-    public BlueNoiseSampler(int bits, uint seed)
+    public Pach1(int bits, uint seed)
     {
-        this.Noise = new SquirrelNoise(seed);
+        this.Noise = new Squirrel3(seed);
         this.Bits = bits;
     }
 
@@ -105,9 +105,12 @@ public readonly struct BlueNoiseSampler
             int x0 = x & mask;
             int y0 = y & mask;
 
+            int row = x >> Bits;
+            int col = y >> Bits;
+
             // pick a random column and row for the cell
-            int rndColumn = BalancedSequence(x >> Bits, 0);
-            int rndRow = BalancedSequence(y >> Bits, 1);
+            int rndColumn = BalancedSequence(row, 0);
+            int rndRow = BalancedSequence(col, 1);
 
             // pick a row and column from the cannonical grid layout
             // as described in the original article

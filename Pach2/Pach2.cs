@@ -10,10 +10,10 @@ using System;
 ///   without calculating neighbors.
 ///   Requires no storage or initial computations.
 /// </remarks>
-public readonly struct PoissonDiskSampler
+public readonly struct Pach2
 {
     /// Repeatable random number generator
-    private readonly SquirrelNoise Noise;
+    private readonly Squirrel3 Noise;
 
     /// the cell size will be 2 ^ bits
     private readonly int Bits;
@@ -39,9 +39,9 @@ public readonly struct PoissonDiskSampler
     ///   Different seeds produce different samples
     /// </param>
     /// <param name="width">
-    public PoissonDiskSampler(int bits, uint seed)
+    public Pach2(int bits, uint seed)
     {
-        this.Noise = new SquirrelNoise(seed);
+        this.Noise = new Squirrel3(seed);
         this.Bits = bits;
     }
 
@@ -131,19 +131,19 @@ public readonly struct PoissonDiskSampler
         // That means that only one of s0 and s1 will be black
         // this variable determines which one it is
         bool prevIsWhite = ((row ^ col) & 2) == 0; 
-        Sample whiteSample = prevIsWhite ? s0 : s1;
 
-        Sample blackSample = prevIsWhite ? s1 : s0;
+        uint whiteValue = prevIsWhite ? s0.Value : s1.Value;
+        uint blackValue = prevIsWhite ? s1.Value : s0.Value;
 
         // get the y value from the black one one:
-        int y = prevIsWhite ? (int)blackSample.Value & mask : ((int)blackSample.Value >> Bits) & mask;
+        int y = prevIsWhite ? (int)blackValue & mask : ((int)blackValue >> Bits) & mask;
 
 
         // get the y values from the black one:
-        int x1 = (int)(whiteSample.Value & mask);
-        int x2 = (int)((whiteSample.Value >> Bits) & mask);
+        int x1 = (int)(whiteValue & mask);
+        int x2 = (int)((whiteValue >> Bits) & mask);
 
-        int x = prevIsWhite ? Math.Min(x1, x2) : Math.Max(x1,x2);
+        int x = prevIsWhite ? Math.Max(x1, x2) : Math.Min(x1,x2);
 
         bool valid = x >= s0.X && x <= s1.X;
 
@@ -174,7 +174,7 @@ public readonly struct PoissonDiskSampler
         // That means that only one of s0 and s1 will be black
         // this variable determines which one it is
         bool prevIsWhite = ((row ^ col) & 2) == 0; 
-
+        
         // get the x value from the white one:
         int x = prevIsWhite ? (int)s0.Value & mask : ((int)s1.Value >> Bits) & mask;
 

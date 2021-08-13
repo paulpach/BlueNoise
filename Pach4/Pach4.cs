@@ -10,10 +10,10 @@ using System;
 ///   without calculating neighbors.
 ///   Requires no storage or initial computations.
 /// </remarks>
-public readonly struct PoissonDiskSampler2
+public readonly struct Pach4
 {
     /// Repeatable random number generator
-    private readonly SquirrelNoise Noise;
+    private readonly Squirrel3 Noise;
 
     /// the cell size will be 2 ^ bits
     private readonly int Bits;
@@ -40,35 +40,23 @@ public readonly struct PoissonDiskSampler2
     ///   Different seeds produce different samples
     /// </param>
     /// <param name="width">
-    public PoissonDiskSampler2(int bits, uint seed)
+    public Pach4(int bits, uint seed)
     {
-        this.Noise = new SquirrelNoise(seed);
+        this.Noise = new Squirrel3(seed);
         this.Bits = bits;
     }
 
-    /// Sequence of numbers such that s(i+1) - s(i) > cellSize / 2
-    /// such that as long as samples are placed in the range
-    /// they are guaranteed to be at least n blocks appart
-    /// or -1 if not possible
-    private int GenerateRnd(int i, int seq, int axis)
+    private Sample GenerateSample(int row, int col)
     {
         int cellSize = 1 << Bits;
         int mask = cellSize - 1;
-        int rnd = (int)Noise[i, seq, axis] & mask;
+        uint rnd = Noise[row, col];
 
-        if (((i + seq) & 0x1) == 0)
-        {
-            return rnd;
-        }
-        else {
-            int prev = (int)Noise[i-1, seq, axis] & mask;
-            int next = (int)Noise[i+1, seq, axis] & mask;;
-
-            if (prev > next)
-                return -1;
-
-            return Lerp(prev, next, rnd);
-        }
+        int x = (int)(rnd & mask);
+        int y = (int)((rnd >> Bits) & mask);
+        
+        return new Sample{ X = x, Y = y, Value = rnd };
+                
     }
 
     /// <summary>
@@ -82,17 +70,6 @@ public readonly struct PoissonDiskSampler2
         return ((a1 - a0) * w + a0 * cellSize + (cellSize >> 1) ) >> Bits;
     }
 
-    public Sample GenerateSample(int row, int col)
-    {
-        int sx = GenerateRnd(col, row, 0);
-        int sy = GenerateRnd(row, col, 1);
-
-        if (sx == -1 || sy == -1) {
-            return new Sample { X = sx, Y = sy, Value = 0 };
-        }
-
-        return new Sample{ X = sx, Y = sy, Value = 1 };       
-    }
 
     public Sample this [int x, int y]
     {
@@ -102,25 +79,36 @@ public readonly struct PoissonDiskSampler2
 
             int x0 = col << Bits;
             int y0 = row << Bits;
+            
+            int halfCell = (1 << Bits) >> 1;
 
-            Sample sample = GenerateSample(row,col);
+            Sample s00 = GenerateSample(row,col);
+            Sample s01 = GenerateSample(row,col+1);
+            Sample s10 = GenerateSample(row+1,col);
+            Sample s11 = GenerateSample(row+1,col+1);
 
-           // now make sure we don't clash with the diagonals
-            Sample ur = GenerateSample(row+1, col+1);
-            Sample lr = GenerateSample(row-1, col+1); 
+            int x1 = 0;
+            int x2 = 256;
+            int x3 = (s00.X + s01.X) >> 1;
+            int x4 = (s10.X + s11.X) >> 1;
 
-            if (sample.X > ur.X && sample.Y > ur.Y && ur.Valid) {
-                return new Sample { X = sample.X, Y = sample.Y, Value = 0 };
+            int y1 = (s00.Y + s10.Y) >> 1;
+            int y2 = (s10.Y + s11.Y) >> 1;
+            int y3 = 0;
+            int y4 = 256;
+
+            int d = (x1-x2) * (y3-y4) - (y1-y2) * (x3-x4);
+
+            int px = (x1*y2 - y1*x2) * (x3-x4) - (x1-x2)*(x3*y4 - y3*x4);
+            int py = (x1*y2 - y1*x2) * (y3-y4) - (y1-y2)*(x3*y4 - y3*x4);
+
+            if (d == 0) {
+                // no solution
+                return new Sample { X = 0, Y = 0, Value = 0 };
             }
-            if (sample.X > lr.X && sample.Y < lr.Y && lr.Valid) {
-                return new Sample { X = sample.X, Y = sample.Y, Value = 0 };
-            }
-
-            sample.X += x0;
-            sample.Y += y0;
 
 
-            return sample;
+            return new Sample { X = px/d + x0, Y = py/d + y0, Value = s00.Value };
         }
     }
 

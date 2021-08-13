@@ -1,88 +1,51 @@
-# Blue Noise
+# Procedural object placement
 
-An algorithm that generates random points in the plane with a minimum distance between them
+I am making a game with procedural world generation.
+In this game, I want to generate villages.
+In each village, I want to place houses, fountains, wells, churches, etc...
 
-It is a modification of the algorithm proposed by [Dr. Roberts](http://extremelearning.com.au/isotropic-blue-noise-point-sets/).
+I can just place random structures in random places in the village,  however this looks terrible because I my put two houses too close to each other and they might overlap.
 
-![Example](example.png)
+I can place them on a grid making sure that each structure stays in it's assigned cell. But this is not interesting enough for players. The objects should be placed in seemingly random places.
 
-# Improvements
+I have not come up with the absolute perfect solution yet, but I present a set of algorithms to solve this problem, each with pros and cons.
 
-Besides the features described in the [original article](http://extremelearning.com.au/isotropic-blue-noise-point-sets/), this version has the following features:
+## Shape of objects
 
-* Infinite plane with no repeating patterns 
-* No storage needed (no precomputed tiles or permutations)
-* O(1) very fast initialization
-* O(1) very fast sampling of any arbitrary cell, no need to evaluate neighbor cells
-* only integer math is required
-* No divisions, only bit shifts. I achieve this by restricting cell sizes to powers of 2
-* Seeded. Each seed produces different samples
+The shape of objects I am placing matters.  If the objecs are circular, then I must enforce that the distance between two objects is at least some k (euclidian distance between the centers).
 
-Unlike the original algorithm, this does not guarantee 1-D uniform projections.
+In my game, the objects are square in shape, and I must ensure that these squares don't overlap.  Some algorithms work better with squares while others work better with distance. Notice that if squares of size n don't touch, then by necessity, the minimum distance between two objects is n, since every square has inside a circle of radius `n/2`.
 
-You can find the algorithm in [BlueNoiseSampler.cs](BlueNoiseSampler.cs)
+These algorithms assume all objects are of the same size.  One could generate multiple layouts for the different object sizes and place the large objects first.
 
-# How to run it
+Since I am mostly working with squares, I will use a diffent distance measurement:  the distance between 2 samples is defined as `d = Max(|x2-x1|, |y2-y1|)`, where `(x1,y1)` and `(x2,y2)` are the centers of the squares.  Two squares of size n touch if `d < n` 
 
-I wrote it in .Net core,  and provided a sample program to run the algorithm.
-1) clone this repo
-2) install [.net](https://dotnet.microsoft.com/download)
-3) run the sample program
+## Cells
 
-```sh
-dotnet run Program.cs
-```
+All of these algorithms place objects in cells.  The cells have a size `cellSize * cellSize`, typically 256.  I use cell sizes that are powers of 2 because I can do bit operations instead of more expensive divisions and reminders,  but these can be generalized for any cell size.
+The general interface of these algorithms is:  you provide a coordinate (x,y) and they return a tripplet (x',y',valid)  where (x',y') are the coordinates of the sample in that cell, and valid is true if there is a sample and false otherwise. 
+There are no more than one sample per cell.
 
-# How does it work?
+## Tiles vs no tiles
 
-First you should understand how the [original article](http://extremelearning.com.au/isotropic-blue-noise-point-sets/) works. 
+Ideally one would be able to get the object in any arbitrary cell in an infinite plane.
+Some algorithms are limited to only a finite plane, however they can be extended to an infinite plane by using tiles.
+A tile is a precalculated finite map of placed objects that can be repeated over and over to cover the entire plane.
 
-Long story short: Dr. Roberts calculates what he calls "balanced permutations", and uses them to shuffle rows and columns of a cannonical grid layout.
+Tiles are not ideal, large tiles require large amounts of memory, and expensive to initialize. Small tiles may produce repeating patterns. 
+The ideal algorithm would not require tiling.
 
-## Balanced sequences
+## Multiplayer friendly
 
-Instead of balanced permutations I build "balanced sequences". 
-A balanced sequence is an "infinite" sequence of numbers `s(i)` such that `0 <= s(i) < n` and `|s(i+1) - s(i)| <= n / 2`
-A balanced sequence is pseudorandom, with no discernible pattern.
-A balanced sequence is repeatable,  meaning that if I evaluate `s(i)` more than once, I get the same result.
-A balanced sequence can be evaluated at any random point `s(i)` without having to evaluate all previous values, this is in contrast to `rand()` and most other pseudo random number generators.
+I am specifically looking for an algorithm that I can use for my multiplayer name.  I require both the client and the server to generate the same samples. This adds 2 requirements:
 
-By "infinite" I mean that the sequence is limited only by the limits of the data types. 
-If using 32 bit integers, that means the sequence has 2^32 numbers.  
-This can be easily extended to 64 bits values or more, provided a suitable noise function.
+1) Seeded.  All object placements must be derived from a single 32 bit seed,  so as long as the server and the client have the same seed, they get the same samples. I use a Pseudo random noise function called [Squirrel3](https://www.youtube.com/watch?v=LWFzPP8ZbdU), as a basis for my seeded random number generator, but other noise functions would work fine.
+2) No floating point math. This is a big problem because different platforms and even different compilers might produce slightly different results when doing floating point math.  All math must be done exclusively with integer math that is consistent accross platforms and compilers.
 
-For example,  if n = 8, a valid portion of a balanced sequence would be:
-```..., 0, 4, 3, 7, 6, 3, 2, 5, 6, ...```
+## Density and Maximality
 
-But the following would not be part of a balanced sequence:
-```..., 0, 8, ....```
+If all objects are placed in a grid with cell size equal to the object's size, then they fill up 100% of the space.
+But that is not really a goal,  objects should be scattered randomly, not in a grid. I do want some random space between them.
 
-because the difference between 0 and 8 is greater than n/2
-
-I use 2 separate balanced sequences,  one for rows and one for columns.
-
-To evaluate s(i):
-1. if i is odd,  I simply get a pseudo random number between `[0,n)` using [Squirrel3](https://www.youtube.com/watch?v=LWFzPP8ZbdU).
-2. if i is even:
-    1. I get the value of s(i-1) and s(i+1). 
-    2. calculate the range of numbers that are in range of both values
-    3. pick one randomly using [Squirrel3](https://www.youtube.com/watch?v=LWFzPP8ZbdU)
-
-Note that any other noise function instead of Squirrel3 would work just fine.
-
-Here is the implementation of my [BalancedSequence](BlueNoiseSampler.cs#L61)
-
-Here is my implementation of [Squirrel3](SquirrelNoise.cs)
-
-## Picking rows and columns.
-
-When calculating the value for a cell at (x,y):
-1. I calculate the row and column by dividing by the cell size (I use bit shift since my cell sizes are powers of 2)
-2. I sample s1(row) and s2(col),  
-3. I get the canonical grid layout cell using s1(row) and s2(col)
-
-
-
-
-
+My ideal algorithm would fill the space in such way that no more objects can be placed. That means that the distance between a point and the nearest point is never more than the size of the squares.  I haven't come up with a way to measure this type of coverage yet.
 
