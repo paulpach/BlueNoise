@@ -1,26 +1,28 @@
-# Blue Noise
+# Pach1
 
-An algorithm that generates random points in the plane with a minimum distance between them
+![Samples](example.svg)
+
+## The Good
+
+* Minimum euclidean distance: `n/sqrt(2)`
+* Minimum object distance: `n/2`
+* No tiles
+* Infinite
+* Suitable for blue noise sampling?
+* Every cell has a sample
+* O(1) very fast initialization
+* O(1) very fast sampling of any arbitrary cell, no need to evaluate neighbor cells (need to benchmark)
+
+## The Bad
+
+* Pattern is too regular for my taste it does not look organic
+* the minimum block distance is relatively small compared to the cell size. That means objects will be placed far appart in the game on average.
+
+## How it works
 
 It is a modification of the algorithm proposed by [Dr. Roberts](http://extremelearning.com.au/isotropic-blue-noise-point-sets/).
 
-![Example](example.png)
-
-# Improvements
-
-Besides the features described in the [original article](http://extremelearning.com.au/isotropic-blue-noise-point-sets/), this version has the following features:
-
-* Infinite plane with no repeating patterns 
-* No storage needed (no precomputed tiles or permutations)
-* O(1) very fast initialization
-* O(1) very fast sampling of any arbitrary cell, no need to evaluate neighbor cells
-* only integer math is required
-* No divisions, only bit shifts. I achieve this by restricting cell sizes to powers of 2
-* Seeded. Each seed produces different samples
-
 Unlike the original algorithm, this does not guarantee 1-D uniform projections.
-
-You can find the algorithm in [BlueNoiseSampler.cs](BlueNoiseSampler.cs)
 
 # How to run it
 
@@ -30,12 +32,12 @@ I wrote it in .Net core,  and provided a sample program to run the algorithm.
 3) run the sample program
 
 ```sh
-dotnet run Program.cs
+dotnet run Program --pach1
 ```
 
 # How does it work?
 
-First you should understand how the [original article](http://extremelearning.com.au/isotropic-blue-noise-point-sets/) works. 
+First you should understand how the [Dr. Robert's algorithm](http://extremelearning.com.au/isotropic-blue-noise-point-sets/) works. 
 
 Long story short: Dr. Roberts calculates what he calls "balanced permutations", and uses them to shuffle rows and columns of a cannonical grid layout.
 
@@ -67,12 +69,6 @@ To evaluate s(i):
     1. I get the value of s(i-1) and s(i+1). 
     2. calculate the range of numbers that are in range of both values
     3. pick one randomly using [Squirrel3](https://www.youtube.com/watch?v=LWFzPP8ZbdU)
-
-Note that any other noise function instead of Squirrel3 would work just fine.
-
-Here is the implementation of my [BalancedSequence](BlueNoiseSampler.cs#L61)
-
-Here is my implementation of [Squirrel3](SquirrelNoise.cs)
 
 ## Picking rows and columns.
 

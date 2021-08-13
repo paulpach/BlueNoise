@@ -10,6 +10,15 @@ I can place them on a grid making sure that each structure stays in it's assigne
 
 I have not come up with the absolute perfect solution yet, but I present a set of algorithms to solve this problem, each with pros and cons.
 
+[![Pach1](Pach1/example.svg)](Pach1/Pach1.md)
+[Pach1](Pach1/Pach1.md)
+
+[![Pach2](Pach2/example.svg)](Pach2/Pach2.md)
+[Pach2](Pach2/Pach2.md)
+
+[![Pach2](Pach3/example.svg)](Pach3/Pach3.md)
+[Pach2](Pach3/Pach3.md)
+
 ## Shape of objects
 
 The shape of objects I am placing matters.  If the objecs are circular, then I must enforce that the distance between two objects is at least some k (euclidian distance between the centers).
@@ -18,7 +27,13 @@ In my game, the objects are square in shape, and I must ensure that these square
 
 These algorithms assume all objects are of the same size.  One could generate multiple layouts for the different object sizes and place the large objects first.
 
-Since I am mostly working with squares, I will use a diffent distance measurement:  the distance between 2 samples is defined as `d = Max(|x2-x1|, |y2-y1|)`, where `(x1,y1)` and `(x2,y2)` are the centers of the squares.  Two squares of size n touch if `d < n` 
+## Object distance
+
+Given 2 points (x1,y1) and (x2,y2):
+
+* _Euclidean distance_ is the distance between 2 points in a straight line.  It is given by the formula `sqrt((x2-x1)^2 + (y2-y1)^2)`
+* _Manhattan distance_ is the distance that a taxi cab would travel to go from one place to another in a city,  that is it can only travel east-west or north-south, it is given by the formula `|x2-x1| + |y2-y1|`
+* _Object distance_,  I made this up, but since I am placing squares, I want to measurement of distance that can be used to calculate how close squares are to each other. For my purpose, I define object distance  as `object distance = Max(|x2-x1|, |y2-y1|)`.  Two squares of size n intersect if and only if `object distance < d`.  Another way to look at it is how big of a square can you fit between the points. 
 
 ## Cells
 

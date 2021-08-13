@@ -94,15 +94,18 @@ public readonly struct Pach2
             else if ((row & 1) == 0 && (col & 1) == 1) {
                 // even row, odd column
                 sample = GetEvenRowSample(col, row);
+                // sample.Value = 0;
             } 
             else if ((row & 1) == 1 && (col & 1) == 0) {
                 // odd row, even column
                 sample = GetEvenColSample(col, row);
+                // sample.Value = 0;
             }
             else
             {
                 // odd row, odd column
                 sample = GetEvenRowEvenColSample(col, row);
+                // sample.Value = 0;
             }
             sample.X += x0;
             sample.Y += y0;
