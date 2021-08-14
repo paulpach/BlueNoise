@@ -130,23 +130,23 @@ public readonly struct Pach2
         int halfCell = cellSize >> 1;
         int mask = cellSize - 1;
 
-        // every even cell will be colored with white or black and will alternate
+        // every EE cell will have either horizontal or vertical orientation
         // That means that only one of s0 and s1 will be black
         // this variable determines which one it is
-        bool prevIsWhite = ((row ^ col) & 2) == 0; 
+        bool leftIsHorizontal = ((row ^ col) & 2) == 0; 
 
-        uint whiteValue = prevIsWhite ? s0.Value : s1.Value;
-        uint blackValue = prevIsWhite ? s1.Value : s0.Value;
+        uint whiteValue = leftIsHorizontal ? s0.Value : s1.Value;
+        uint blackValue = leftIsHorizontal ? s1.Value : s0.Value;
 
         // get the y value from the black one one:
-        int y = prevIsWhite ? (int)blackValue & mask : ((int)blackValue >> Bits) & mask;
+        int y = leftIsHorizontal ? (int)blackValue & mask : ((int)blackValue >> Bits) & mask;
 
 
         // get the y values from the black one:
         int x1 = (int)(whiteValue & mask);
         int x2 = (int)((whiteValue >> Bits) & mask);
 
-        int x = prevIsWhite ? Math.Max(x1, x2) : Math.Min(x1,x2);
+        int x = leftIsHorizontal ? Math.Max(x1, x2) : Math.Min(x1,x2);
 
         bool valid = x >= s0.X && x <= s1.X;
 
@@ -176,18 +176,18 @@ public readonly struct Pach2
         // every even cell will be colored with white or black and will alternate
         // That means that only one of s0 and s1 will be black
         // this variable determines which one it is
-        bool prevIsWhite = ((row ^ col) & 2) == 0; 
+        bool topIsHorizontal = ((row ^ col) & 2) == 0; 
         
         // get the x value from the white one:
-        int x = prevIsWhite ? (int)s0.Value & mask : ((int)s1.Value >> Bits) & mask;
+        int x = topIsHorizontal ? (int)s0.Value & mask : ((int)s1.Value >> Bits) & mask;
 
-        Sample blackSample = prevIsWhite ? s1 : s0;
+        Sample blackSample = topIsHorizontal ? s1 : s0;
 
         // get the y values from the black one:
         int y1 = (int)(blackSample.Value & mask);
         int y2 = (int)((blackSample.Value >> Bits) & mask);
 
-        int y = prevIsWhite ? Math.Min(y1, y2) : Math.Max(y1,y2);
+        int y = topIsHorizontal ? Math.Min(y1, y2) : Math.Max(y1,y2);
 
         bool valid = y >= s0.Y && y <= s1.Y;
 
