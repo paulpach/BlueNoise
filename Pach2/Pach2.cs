@@ -215,70 +215,58 @@ public readonly struct Pach2
         Sample middleLeft = GetColAdjustedSample(col - 1, row, ll, ul);
         Sample middleRight = GetColAdjustedSample(col + 1, row, lr, ur);
 
-
+        // find the min and max x 
+        // check the corners and middles
         int minx = middleLeft.Valid ? middleLeft.X : 0;
         int miny = lowerMiddle.Valid ? lowerMiddle.Y : 0;
         int maxx = middleRight.Valid ? middleRight.X : cellSize - 1;
         int maxy = upperMiddle.Valid ? upperMiddle.Y : cellSize - 1;
 
+        if (ll.Y > maxy)
+            minx = Math.Max(minx, ll.X);
+        if (ul.Y < miny)
+            minx = Math.Max(minx, ul.X);
+        if (ll.Y > ul.Y) {
+            int tmp = Math.Min(ll.X, ul.X);
+            minx = Math.Max(minx, tmp);
+        }
+
+        if (lr.Y > maxy)
+            maxx = Math.Min(maxx, lr.X);
+        if (ur.Y < miny)
+            maxx = Math.Min(maxx, ur.X);
+        if (lr.Y > ur.Y) {
+            int tmp = Math.Max(lr.X, ur.X);
+            maxx = Math.Min(maxx, tmp);
+        }
+
         // no where to put the sample
-        if (minx > maxx || miny > maxy) {
+        if (minx > maxx) {
             return new Sample{ X = 0, Y = 0, Value = 0 };
         }
 
-
         Sample sample = GenerateCandidate(col, row);
 
-        // (x,y) do not interfere with the sides
         int x = Lerp(minx, maxx, sample.X);
-        int y = Lerp(miny, maxy, sample.Y);
-        
-        int conflictMinx = minx;
-        int conflictMaxx = maxx;
-        int conflictMiny = miny;
-        int conflictMaxy = maxy;
 
-        if (x < ll.X)
-            conflictMiny = Math.Max(conflictMiny, ll.Y);
-        if (x < ul.X)
-            conflictMaxy = Math.Min(conflictMaxy, ul.Y);
+        // for that particular x, find the min and max y
+        if (x < ll.X )
+            miny = Math.Max(miny, ll.Y);
         if (x > lr.X)
-            conflictMiny = Math.Max(conflictMiny, lr.Y);
+            miny = Math.Max(miny, lr.Y);
+
+        if (x < ul.X)
+            maxy = Math.Min(maxy, ul.Y);
         if (x > ur.X)
-            conflictMaxy = Math.Min(conflictMaxy, ur.Y);
+            maxy = Math.Min(maxy, ur.Y);
 
-        if (y < ll.Y)
-            conflictMinx = Math.Max(conflictMinx, ll.X);
-        if (y < lr.Y)
-            conflictMaxx = Math.Min(conflictMaxx, lr.X);
-        if (y > ul.Y)
-            conflictMinx = Math.Max(conflictMinx, ul.X);
-        if (y > ur.Y)
-            conflictMaxx = Math.Min(conflictMaxx, ur.X);
-
-        // find out conflicts
-        bool llConflict = ll.X > x && ll.Y > y;
-        bool ulConflict = ul.X > x && ul.Y < y;
-        bool lrConflict = lr.X < x && lr.Y > y;
-        bool urConflict = ur.X < x && ur.Y < y;
-
-        if (llConflict || ulConflict || lrConflict || urConflict) {
-            // can we solve the conflict by moving in X or Y direction?
-            if (conflictMinx > conflictMaxx && conflictMiny > conflictMaxy) {
-                return new Sample { X = 0, Y = 0, Value = 0 };
-            }
-
-            // shift only x or y to solve the conflict,  never both
-            if (conflictMaxx - conflictMinx > conflictMaxy - conflictMiny) {
-                x = Lerp(conflictMinx, conflictMaxx, sample.X);
-            }
-            else {
-                y = Lerp(conflictMiny, conflictMaxy, sample.Y);
-            }
-
+        if (miny > maxy) {
+            return new Sample{ X = 0, Y = 0, Value = 0 };
         }
 
+        int y = Lerp(miny, maxy, sample.Y);
+
         return new Sample{ X = x, Y = y, Value = 1 };
-   }
+    }
 
 }
