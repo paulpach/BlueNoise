@@ -1,5 +1,6 @@
 
 using System;
+
 /// <summary>
 ///   Generates samples with minimum distance
 /// </summary>
@@ -10,26 +11,13 @@ using System;
 ///   without calculating neighbors.
 ///   Requires no storage or initial computations.
 /// </remarks>
-public readonly struct Pach2
+public readonly struct Pach2 : ISampler
 {
     /// Repeatable random number generator
     private readonly Squirrel3 Noise;
 
     /// the cell size will be 2 ^ bits
     private readonly int Bits;
-
-    /// A sample is a (x,y) coordinate plus a random value
-    public struct Sample {
-        public int X;
-        public int Y;
-
-        // value is just a random number associated with this sample
-        // but there is a special case,  if Value == 0, then 
-        // this is not a valid sample, and should be ignored
-        public uint Value;  
-
-        public bool Valid => Value != 0;
-    }
 
     /// <summary>
     ///   Generates samples with minimum distance
@@ -52,7 +40,7 @@ public readonly struct Pach2
         uint cellSize = 1u << Bits;
         uint mask = cellSize - 1;
 
-        uint rnd = Noise[row,col];
+        uint rnd = Noise[row, col];
         int xr = (int)(rnd & mask);
         rnd >>= Bits;
         int yr = (int)(rnd & mask);
@@ -70,12 +58,13 @@ public readonly struct Pach2
     {
         int cellSize = 1 << Bits;
         // ((a1 - a0) * w + a0;
-        return ((a1 - a0) * w + a0 * cellSize + (cellSize >> 1) ) >> Bits;
+        return ((a1 - a0) * w + a0 * cellSize + (cellSize >> 1)) >> Bits;
     }
 
-    public Sample this [int x, int y]
+    public Sample this[int x, int y] 
     {
-        get {            
+        get
+        {
             int col = x >> Bits;
             int row = y >> Bits;
 
@@ -86,17 +75,20 @@ public readonly struct Pach2
             Sample sample;
 
             // there are 4 cases:
-            if ((row & 1) == 0 && (col & 1) == 0) {
+            if ((row & 1) == 0 && (col & 1) == 0)
+            {
                 // even row, even column
                 // these cells are fully randomized, just get a sample and return it
                 sample = GenerateCandidate(col, row);
             }
-            else if ((row & 1) == 0 && (col & 1) == 1) {
+            else if ((row & 1) == 0 && (col & 1) == 1)
+            {
                 // even row, odd column
                 sample = GetEvenRowSample(col, row);
                 // sample.Value = 0;
-            } 
-            else if ((row & 1) == 1 && (col & 1) == 0) {
+            }
+            else if ((row & 1) == 1 && (col & 1) == 0)
+            {
                 // odd row, even column
                 sample = GetEvenColSample(col, row);
                 // sample.Value = 0;
@@ -133,7 +125,7 @@ public readonly struct Pach2
         // every EE cell will have either horizontal or vertical orientation
         // That means that only one of s0 and s1 will be black
         // this variable determines which one it is
-        bool leftIsHorizontal = ((row ^ col) & 2) == 0; 
+        bool leftIsHorizontal = ((row ^ col) & 2) == 0;
 
         uint whiteValue = leftIsHorizontal ? s0.Value : s1.Value;
         uint blackValue = leftIsHorizontal ? s1.Value : s0.Value;
@@ -146,11 +138,12 @@ public readonly struct Pach2
         int x1 = (int)(whiteValue & mask);
         int x2 = (int)((whiteValue >> Bits) & mask);
 
-        int x = leftIsHorizontal ? Math.Max(x1, x2) : Math.Min(x1,x2);
+        int x = leftIsHorizontal ? Math.Max(x1, x2) : Math.Min(x1, x2);
 
         bool valid = x >= s0.X && x <= s1.X;
 
-        return new Sample {
+        return new Sample
+        {
             X = x,
             Y = y,
             Value = valid ? 1u : 0u
@@ -176,8 +169,8 @@ public readonly struct Pach2
         // every even cell will be colored with white or black and will alternate
         // That means that only one of s0 and s1 will be black
         // this variable determines which one it is
-        bool topIsHorizontal = ((row ^ col) & 2) == 0; 
-        
+        bool topIsHorizontal = ((row ^ col) & 2) == 0;
+
         // get the x value from the white one:
         int x = topIsHorizontal ? (int)s0.Value & mask : ((int)s1.Value >> Bits) & mask;
 
@@ -187,11 +180,12 @@ public readonly struct Pach2
         int y1 = (int)(blackSample.Value & mask);
         int y2 = (int)((blackSample.Value >> Bits) & mask);
 
-        int y = topIsHorizontal ? Math.Min(y1, y2) : Math.Max(y1,y2);
+        int y = topIsHorizontal ? Math.Min(y1, y2) : Math.Max(y1, y2);
 
         bool valid = y >= s0.Y && y <= s1.Y;
 
-        return new Sample {
+        return new Sample
+        {
             X = x,
             Y = y,
             Value = valid ? 1u : 0u
@@ -226,7 +220,8 @@ public readonly struct Pach2
             minx = Math.Max(minx, ll.X);
         if (ul.Y < miny)
             minx = Math.Max(minx, ul.X);
-        if (ll.Y > ul.Y) {
+        if (ll.Y > ul.Y)
+        {
             int tmp = Math.Min(ll.X, ul.X);
             minx = Math.Max(minx, tmp);
         }
@@ -235,22 +230,49 @@ public readonly struct Pach2
             maxx = Math.Min(maxx, lr.X);
         if (ur.Y < miny)
             maxx = Math.Min(maxx, ur.X);
-        if (lr.Y > ur.Y) {
+        if (lr.Y > ur.Y)
+        {
             int tmp = Math.Max(lr.X, ur.X);
             maxx = Math.Min(maxx, tmp);
         }
 
         // no where to put the sample
-        if (minx > maxx) {
-            return new Sample{ X = 0, Y = 0, Value = 0 };
+        if (minx > maxx)
+        {
+            return new Sample { X = 0, Y = 0, Value = 0 };
         }
+
+        int gapminx = maxx;
+        int gapmaxx = minx;
+
+        if (ll.X > ur.X && ll.Y > ur.Y)
+        {
+            // lower left and upper are too close,  
+            // so there are some x values we can't use
+            gapminx = Math.Min(ur.X, gapminx);
+            gapmaxx = Math.Max(ll.X, gapmaxx);
+        }
+        if (ul.X > lr.X && ul.Y < lr.Y)
+        {
+            gapminx = Math.Min(lr.X, gapminx);
+            gapmaxx = Math.Max(ul.X, gapmaxx);
+        }
+
+        if (gapmaxx < gapminx)
+            gapmaxx = gapminx;
+
+        gapmaxx = Math.Min(gapmaxx, maxx);
+        gapminx = Math.Max(gapminx, minx);
 
         Sample sample = GenerateCandidate(col, row);
 
-        int x = Lerp(minx, maxx, sample.X);
+        int x = Lerp(minx, maxx - (gapmaxx - gapminx), sample.X);
+
+        if (x > gapminx)
+            x += gapmaxx - gapminx;
 
         // for that particular x, find the min and max y
-        if (x < ll.X )
+        if (x < ll.X)
             miny = Math.Max(miny, ll.Y);
         if (x > lr.X)
             miny = Math.Max(miny, lr.Y);
@@ -260,13 +282,14 @@ public readonly struct Pach2
         if (x > ur.X)
             maxy = Math.Min(maxy, ur.Y);
 
-        if (miny > maxy) {
-            return new Sample{ X = 0, Y = 0, Value = 0 };
+        if (miny > maxy)
+        {
+            return new Sample { X = 0, Y = 0, Value = 0 };
         }
 
         int y = Lerp(miny, maxy, sample.Y);
 
-        return new Sample{ X = x, Y = y, Value = 1 };
+        return new Sample { X = x, Y = y, Value = 1 };
     }
 
 }

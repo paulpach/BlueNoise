@@ -9,49 +9,26 @@ namespace BlueNoise
             if (args.Length ==0 || args[0] == "--pach1")
             {
                 // the size of the cells is 2 ^ bits
-                RunPach1();
+                RunSampler(new Pach1(8, 0));
             }
             else if (args[0] == "--pach2")
             {
-                RunPach2();
+                RunSampler(new Pach2(8, 0));
             }
             else if (args[0] == "--pach3")
             {
-                RunPach3();
+                RunSampler(new Pach3(8, 0));
             }
             else if (args[0] == "--pach4")
             {
-                RunPach4();
+                RunSampler(new Pach4(8, 0));
             }
         }
-
-        private static void RunPach1()
+        
+        private static void RunSampler<T>(T sampler) where T: ISampler
         {
             int bits = 8;
             int cellSize = 1 << bits;
-
-            Pach1 sampler = new Pach1(bits, (uint)new System.DateTime().Millisecond);
-
-            int gridSize = 30;
-
-            double radius = gridSize / (2 * Math.Sqrt(2));
-            for (int x = 0; x < gridSize * cellSize; x += cellSize)
-            {
-                for (int y = 0; y < gridSize * cellSize; y += cellSize)
-                {
-
-                    var (xs, ys) = sampler[x, y];
-                    Console.WriteLine($"{xs}, {ys}");
-                }
-            }
-        }
-
-        private static void RunPach2()
-        {
-            int bits = 8;
-            int cellSize = 1 << bits;
-
-            Pach2 sampler = new Pach2(bits, 0);
 
             int gridSize = 30;
 
@@ -62,64 +39,10 @@ namespace BlueNoise
 
                     var sample = sampler[x, y];
 
-                    int row = x >> bits;
-                    int col = y >> bits;
-
                     if (sample.Valid )
                         Console.WriteLine($"{sample.X}, {sample.Y}");
                 }
             }
         }
-        private static void RunPach3()
-        {
-            int bits = 8;
-            int cellSize = 1 << bits;
-
-            Pach3 sampler = new Pach3(bits, 0);
-
-            int gridSize = 30;
-
-            for (int x = 0; x < gridSize * cellSize; x += cellSize)
-            {
-                for (int y = 0; y < gridSize * cellSize; y += cellSize)
-                {
-
-                    var sample = sampler[x, y];
-
-                    int row = x >> bits;
-                    int col = y >> bits;
-
-                    if (sample.Valid )
-                        Console.WriteLine($"{sample.X}, {sample.Y}");
-                }
-            }
-        }
-       
-    
-        private static void RunPach4()
-        {
-            int bits = 8;
-            int cellSize = 1 << bits;
-
-            Pach4 sampler = new Pach4(bits, 0);
-
-            int gridSize = 30;
-
-            for (int x = 0; x < gridSize * cellSize; x += cellSize)
-            {
-                for (int y = 0; y < gridSize * cellSize; y += cellSize)
-                {
-
-                    var sample = sampler[x, y];
-
-                    int row = x >> bits;
-                    int col = y >> bits;
-
-                    if (sample.Valid )
-                        Console.WriteLine($"{sample.X}, {sample.Y}");
-                }
-            }
-        }
-       
     }
 }

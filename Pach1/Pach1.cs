@@ -10,7 +10,7 @@ using System;
 ///   without calculating neighbors.
 ///   Requires no storage or initial computations.
 /// </remarks>
-public readonly struct Pach1
+public readonly struct Pach1 : ISampler
 {
     /// Repeatable random number generator
     private readonly Squirrel3 Noise;
@@ -95,7 +95,7 @@ public readonly struct Pach1
 
     }
 
-    public (int, int) this [int x, int y]
+    public Sample this [int x, int y]
     {
         get {            
             int cellSize = 1 << Bits;
@@ -114,7 +114,11 @@ public readonly struct Pach1
 
             // pick a row and column from the cannonical grid layout
             // as described in the original article
-            return (x0 + rndRow, y0 + cellSize - rndColumn - 1);
+            return new Sample {
+                X = x0 + rndRow,
+                Y = y0 + cellSize - rndColumn - 1,
+                Value = 1
+            };
         }
     }
 
