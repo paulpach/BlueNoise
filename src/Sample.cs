@@ -2,13 +2,24 @@
 /// A sample is a (x,y) coordinate plus a random value
 public struct Sample
 {
+    /// <summary>
+    /// The x coordinate of the sample
+    /// </summary>
     public int X;
+
+    /// <summary>
+    /// The y coordinate of the sample
+    /// </summary>
     public int Y;
 
-    // value is just a random number associated with this sample
-    // but there is a special case,  if Value == 0, then 
-    // this is not a valid sample, and should be ignored
+    /// <summary>
+    /// The random value of the sample
+    /// 0 if the sample is not valid
+    /// </summary>
     public uint Value;
 
+    /// <summary>
+    /// True if the sample is valid
+    /// </summary>
     public bool Valid => Value != 0;
 }

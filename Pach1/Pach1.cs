@@ -26,7 +26,9 @@ public readonly struct Pach1 : ISampler
     ///   Seed for random number generator
     ///   Different seeds produce different samples
     /// </param>
-    /// <param name="width">
+    /// <param name="bits">
+    ///   Number of bits for the cell size
+    /// </param>
     public Pach1(int bits, uint seed)
     {
         this.Noise = new Squirrel3(seed);
@@ -95,6 +97,9 @@ public readonly struct Pach1 : ISampler
 
     }
 
+    /// <summary>
+    ///   Generates a sample at the cell containing (x,y)
+    /// </summary>
     public Sample this [int x, int y]
     {
         get {            

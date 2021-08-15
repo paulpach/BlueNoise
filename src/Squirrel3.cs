@@ -4,8 +4,8 @@
 ///  returns a random 32 bit integer.
 /// </summary>
 /// <remarks>
-/// Squirrel noise as described in:
-/// https://www.youtube.com/watch?v=LWFzPP8ZbdU&t=2021s
+/// Squirrel3 noise as described in:
+/// <see href="https://www.youtube.com/watch?v=LWFzPP8ZbdU">Squirrel3</see>
 /// </remarks>
  public readonly struct Squirrel3
     {
@@ -23,6 +23,9 @@
         const uint NOISE2 = 0x68e31da4; //0b1011'0101'0010'1001'0111'1010'0100'1101
         const uint NOISE3 = 0x1b56c4e9; //0b0001'1011'0101'0110'1100'0100'1110'1001
 
+        /// <summary>
+        /// Return a random value at a given position
+        /// </summary>
         public uint this[int position]
         {
             get 
@@ -45,7 +48,13 @@
         private const int PRIME1=198491317;
         private const int PRIME2=6542089;
 
+        /// <summary>
+        /// Returns a random value at a given 2d coordinate
+        /// </summary>
         public uint this[int x, int y] => this[x + y * PRIME1];
 
+        /// <summary>
+        /// Returns a random value at a given 3d coordinate
+        /// </summary>
         public uint this[int x, int y, int z] => this[x + y * PRIME1 + z * PRIME2];
     }

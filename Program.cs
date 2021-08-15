@@ -4,30 +4,33 @@ namespace BlueNoise
 {
     class Program
     {
-        static void Main(string[] args)
+        /// <summary>
+        /// Calculates random samples within an area that maintain minimum distance
+        /// </summary>
+        /// <param name="algorithm">The algorithm to use,  there are 4 algorithms</param>
+        /// <param name="bits">number of bits to use for cell size: 1-8</param>
+        /// <param name="seed">seed to derive the samples from</param>
+        static void Main(int algorithm = 2, int bits = 8, uint seed = 0)
         {
-            if (args.Length ==0 || args[0] == "--pach1")
-            {
-                // the size of the cells is 2 ^ bits
-                RunSampler(new Pach1(8, 0));
-            }
-            else if (args[0] == "--pach2")
-            {
-                RunSampler(new Pach2(8, 0));
-            }
-            else if (args[0] == "--pach3")
-            {
-                RunSampler(new Pach3(8, 0));
-            }
-            else if (args[0] == "--pach4")
-            {
-                RunSampler(new Pach4(8, 0));
+            switch (algorithm) {
+                case 1:
+                    RunSampler(new Pach1(bits, seed), bits);
+                    break;
+                case 2:
+                    RunSampler(new Pach2(bits, seed), bits);
+                    break;
+                case 3:
+                    RunSampler(new Pach3(bits, seed), bits);
+                    break;
+                case 4:
+                    RunSampler(new Pach4(bits, seed), bits);
+                    break;
+
             }
         }
         
-        private static void RunSampler<T>(T sampler) where T: ISampler
+        private static void RunSampler<T>(T sampler, int bits) where T: ISampler
         {
-            int bits = 8;
             int cellSize = 1 << bits;
 
             int gridSize = 30;
