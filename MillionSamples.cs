@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 namespace BlueNoise
 {
@@ -7,30 +8,25 @@ namespace BlueNoise
     public class MillionSamples {
 
         /// <summary>
-        /// benchmark pach1
+        /// Samplers to benchmark
         /// </summary>
-        [Benchmark]
-        public void pach1() => RunSamples(new Pach1(8, 0), 8);
+        /// <returns></returns> 
+        public IEnumerable<object[]> Samplers()
+        {
+            yield return new object[] { new Pach1(8,0), 8 };
+            yield return new object[] { new Pach2(8,0), 8 };
+            yield return new object[] { new Pach3(8,0), 8 };
+            yield return new object[] { new Pach4(8,0), 8 };
+        }
 
         /// <summary>
-        /// benchmark pach2
+        /// Runs each sampler 1 million times
         /// </summary>
+        /// <param name="sampler"></param>
+        /// <param name="bits"></param>
         [Benchmark]
-        public void pach2() => RunSamples(new Pach2(8, 0), 8);
-
-        /// <summary>
-        /// benchmark pach3
-        /// </summary>
-        [Benchmark]
-        public void pach3() => RunSamples(new Pach3(8, 0), 8);
-
-        /// <summary>
-        /// benchmark pach4
-        /// </summary>
-        [Benchmark]
-        public void pach4() => RunSamples(new Pach4(8, 0), 8);
-
-        private static void RunSamples<T>(T sampler, int bits) where T: ISampler
+        [ArgumentsSource(nameof(Samplers))]
+        public void benchmark(ISampler sampler, int bits)
         {
             int cellSize = 1 << bits;
 
