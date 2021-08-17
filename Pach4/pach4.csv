@@ -1,3 +1,10 @@
+/Users/aa557659/BlueNoise/src/Rect.cs(5,15): warning CS1591: Missing XML comment for publicly visible type or member 'Rect' [/Users/aa557659/BlueNoise/PachNoise.csproj]
+/Users/aa557659/BlueNoise/src/Rect.cs(7,16): warning CS1591: Missing XML comment for publicly visible type or member 'Rect.xmin' [/Users/aa557659/BlueNoise/PachNoise.csproj]
+/Users/aa557659/BlueNoise/src/Rect.cs(8,16): warning CS1591: Missing XML comment for publicly visible type or member 'Rect.xmax' [/Users/aa557659/BlueNoise/PachNoise.csproj]
+/Users/aa557659/BlueNoise/src/Rect.cs(9,16): warning CS1591: Missing XML comment for publicly visible type or member 'Rect.ymin' [/Users/aa557659/BlueNoise/PachNoise.csproj]
+/Users/aa557659/BlueNoise/src/Rect.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'Rect.ymax' [/Users/aa557659/BlueNoise/PachNoise.csproj]
+/Users/aa557659/BlueNoise/src/Rect.cs(12,17): warning CS1591: Missing XML comment for publicly visible type or member 'Rect.Valid' [/Users/aa557659/BlueNoise/PachNoise.csproj]
+/Users/aa557659/BlueNoise/src/Rect.cs(14,16): warning CS1591: Missing XML comment for publicly visible type or member 'Rect.Area' [/Users/aa557659/BlueNoise/PachNoise.csproj]
 235, 110
 246, 462
 84, 732

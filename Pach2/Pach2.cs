@@ -215,87 +215,32 @@ public readonly struct Pach2 : ISampler
         Sample middleLeft = GetColAdjustedSample(col - 1, row, ll, ul);
         Sample middleRight = GetColAdjustedSample(col + 1, row, lr, ur);
 
-        // find the min and max x 
-        // check the corners and middles
-        int minx = middleLeft.Valid ? middleLeft.X : 0;
-        int miny = lowerMiddle.Valid ? lowerMiddle.Y : 0;
-        int maxx = middleRight.Valid ? middleRight.X : cellSize - 1;
-        int maxy = upperMiddle.Valid ? upperMiddle.Y : cellSize - 1;
-
-        if (ll.Y > maxy)
-            minx = Math.Max(minx, ll.X);
-        if (ul.Y < miny)
-            minx = Math.Max(minx, ul.X);
-        if (ll.Y > ul.Y)
+        Rect baseRect = new Rect
         {
-            int tmp = Math.Min(ll.X, ul.X);
-            minx = Math.Max(minx, tmp);
+            xmin = middleLeft.Valid ? middleLeft.X : 0,
+            ymin = lowerMiddle.Valid ? lowerMiddle.Y : 0,
+            xmax = middleRight.Valid ? middleRight.X : cellSize - 1,
+            ymax = upperMiddle.Valid ? upperMiddle.Y : cellSize - 1,
+        };
+
+        Rect rect = OverlapCalculator.CutOut(ll, lr, ul, ur, baseRect);
+
+        if (rect.Valid)
+        {
+            Sample rnd = GenerateCandidate(col, row);
+
+            return new Sample {
+                X = Lerp(rect.xmin, rect.xmax, rnd.X),
+                Y = Lerp(rect.ymin, rect.ymax, rnd.Y),
+                Value = 1
+            };
         }
 
-        if (lr.Y > maxy)
-            maxx = Math.Min(maxx, lr.X);
-        if (ur.Y < miny)
-            maxx = Math.Min(maxx, ur.X);
-        if (lr.Y > ur.Y)
+        return new Sample
         {
-            int tmp = Math.Max(lr.X, ur.X);
-            maxx = Math.Min(maxx, tmp);
-        }
-
-        // no where to put the sample
-        if (minx > maxx)
-        {
-            return new Sample { X = 0, Y = 0, Value = 0 };
-        }
-
-        int gapminx = maxx;
-        int gapmaxx = minx;
-
-        if (ll.X > ur.X && ll.Y > ur.Y)
-        {
-            // lower left and upper are too close,  
-            // so there are some x values we can't use
-            gapminx = Math.Min(ur.X, gapminx);
-            gapmaxx = Math.Max(ll.X, gapmaxx);
-        }
-        if (ul.X > lr.X && ul.Y < lr.Y)
-        {
-            gapminx = Math.Min(lr.X, gapminx);
-            gapmaxx = Math.Max(ul.X, gapmaxx);
-        }
-
-        if (gapmaxx < gapminx)
-            gapmaxx = gapminx;
-
-        gapmaxx = Math.Min(gapmaxx, maxx);
-        gapminx = Math.Max(gapminx, minx);
-
-        Sample sample = GenerateCandidate(col, row);
-
-        int x = Lerp(minx, maxx - (gapmaxx - gapminx), sample.X);
-
-        if (x > gapminx)
-            x += gapmaxx - gapminx;
-
-        // for that particular x, find the min and max y
-        if (x < ll.X)
-            miny = Math.Max(miny, ll.Y);
-        if (x > lr.X)
-            miny = Math.Max(miny, lr.Y);
-
-        if (x < ul.X)
-            maxy = Math.Min(maxy, ul.Y);
-        if (x > ur.X)
-            maxy = Math.Min(maxy, ur.Y);
-
-        if (miny > maxy)
-        {
-            return new Sample { X = 0, Y = 0, Value = 0 };
-        }
-
-        int y = Lerp(miny, maxy, sample.Y);
-
-        return new Sample { X = x, Y = y, Value = 1 };
+            X = 0,
+            Y = 0,
+            Value = 0
+        };
     }
-
 }

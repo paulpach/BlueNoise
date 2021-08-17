@@ -19,6 +19,7 @@ I have not come up with the absolute perfect solution yet, but I present a set o
 | 1M samples benchmark | <span class="good">29.51 ms</span> | <span class="bad">70.34 ms</span> | <span class="bad">58.72 ms</span> | <span class="good">14.84 ms</span> |
 | Memory use | <span class="good">8 B</span> | <span class="good">8 B</span> | <span class="good">8 B</span> | <span class="bad">786,432 B O(n*n)</span> |
 | Tiled | <span class="good">No</span> | <span class="good">No</span> | <span class="good">No</span> | <span class="bad">Yes</span> |
+| Maximal | 100% | 92% | 50% | 100% |
 
 
 ## Shape of objects
