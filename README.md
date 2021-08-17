@@ -1,5 +1,20 @@
 # Procedural object placement
 
+
+| | Pach1 | Pach2 | Pach3 | Pach4 |
+|-|-------|-------|-------|--------|
+| | <img src="Pach1/example.svg" width="100" height="100"/> | <img src="Pach2/example.svg" width="100" height="100"/> | <img src="Pach3/example.svg" width="100" height="100"/> | <img src="Pach4/example.svg" width="100" height="100"/> |
+| Min Square Distance| n/2 :x: | n :white_check_mark: | n :white_check_mark: | n :white_check_mark: | 
+| Min Euclidean Distance | n/sqrt(2) :x: | n :white_check_mark: | n :white_check_mark: | n :white_check_mark:|
+| Initialization Benchmark | 0.08ns :white_check_mark: | 0.007ns :white_check_mark: | 0.007ns :white_check_mark: | 6,450,032 ns (6 ms) O(n*n) :x: |
+| 1M samples benchmark | 29.51 ms :white_check_mark: | 70.34 ms :x: | 58.72 ms :x: | 14.84 ms :white_check_mark: |
+| Memory use | 8 B :white_check_mark: | 8 B :white_check_mark: | 8 B :white_check_mark: | 786,432 B O(n*n) :x: |
+| Tiled | No :white_check_mark: | No :white_check_mark: | No :white_check_mark: | Yes :x: |
+| Maximal | 100% :white_check_mark:| 92% :white_check_mark:| 50% :x: | 100% :white_check_mark:|
+| Quality | C :x: | A :white_check_mark:| B :x: | A :white_check_mark:|
+
+Here I present 4 algorithms I invented for placing square objects on a plane such that they don't touch each other.  The algorithms are named after me, and all have different pros and cons, which I present in the table above.
+
 I am making a game with procedural world generation.
 In this game, I want to generate villages.
 In each village, I want to place houses, fountains, wells, churches, etc...
@@ -8,19 +23,7 @@ I can just place random structures in random places in the village,  however thi
 
 I can place them on a grid making sure that each structure stays in it's assigned cell. But this is not interesting enough for players. The objects should be placed in seemingly random places.
 
-I have not come up with the absolute perfect solution yet, but I present a set of algorithms to solve this problem, each with pros and cons.
-
-| | Pach1 | Pach2 | Pach3 | Pach4 |
-|-|-------|-------|-------|--------|
-| | <img src="Pach1/example.svg" width="100" height="100"/> | <img src="Pach2/example.svg" width="100" height="100"/> | <img src="Pach3/example.svg" width="100" height="100"/> | <img src="Pach4/example.svg" width="100" height="100"/> |
-| Min Square Distance| <span class="bad">n/2</span> | <span class="good">n</span> | <span class="good">n</span> | <span class="good">n</span> | 
-| Min Euclidean Distance | <span class="bad">n/sqrt(2)</span> | <span class="good">n</span> | <span class="good">n</span> | <span class="good">n</span>|
-| Initialization Benchmark | <span class="good">0.08ns</span> | <span class="good">0.007ns</span> | <span class="good">0.007ns</span> | <span class="bad">6,450,032 ns (6 ms) O(n*n)</span> |
-| 1M samples benchmark | <span class="good">29.51 ms</span> | <span class="bad">70.34 ms</span> | <span class="bad">58.72 ms</span> | <span class="good">14.84 ms</span> |
-| Memory use | <span class="good">8 B</span> | <span class="good">8 B</span> | <span class="good">8 B</span> | <span class="bad">786,432 B O(n*n)</span> |
-| Tiled | <span class="good">No</span> | <span class="good">No</span> | <span class="good">No</span> | <span class="bad">Yes</span> |
-| Maximal | 100% | 92% | 50% | 100% |
-
+I have not come up with the absolute perfect solution yet, but I invented 4 algorithms for procedural object placement with different advantages.
 
 ## Shape of objects
 
@@ -30,13 +33,13 @@ In my game, the objects are square in shape, and I must ensure that these square
 
 These algorithms assume all objects are of the same size.  One could generate multiple layouts for the different object sizes and place the large objects first.
 
-## Object distance
+## Square distance
 
 Given 2 points (x1,y1) and (x2,y2):
 
 * _Euclidean distance_ is the distance between 2 points in a straight line.  It is given by the formula `sqrt((x2-x1)^2 + (y2-y1)^2)`
 * _Manhattan distance_ is the distance that a taxi cab would travel to go from one place to another in a city,  that is it can only travel east-west or north-south, it is given by the formula `|x2-x1| + |y2-y1|`
-* _Object distance_,  I made this up, but since I am placing squares, I want to measurement of distance that can be used to calculate how close squares are to each other. For my purpose, I define object distance  as `object distance = Max(|x2-x1|, |y2-y1|)`.  Two squares of size n intersect if and only if `object distance < d`.  Another way to look at it is how big of a square can you fit between the points. 
+* _Square distance_,  I made this up, but since I am placing squares, I want to measurement of distance that can be used to calculate how close squares are to each other. For my purpose, I define square distance  as `object distance = Max(|x2-x1|, |y2-y1|)`.  Two squares of size n intersect if and only if `object distance < d`.  Another way to look at it is how big of a square can you fit between the points. 
 
 ## Cells
 
