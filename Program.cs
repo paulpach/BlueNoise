@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Running;
 
 namespace BlueNoise
 {
@@ -10,23 +11,21 @@ namespace BlueNoise
         /// <param name="algorithm">The algorithm to use,  there are 4 algorithms</param>
         /// <param name="bits">number of bits to use for cell size: 1-8</param>
         /// <param name="seed">seed to derive the samples from</param>
-        static void Main(int algorithm = 2, int bits = 8, uint seed = 0)
+        /// <param name="benchmark">runs a benchmark on the algorithm</param>
+        static void Main(int algorithm = 2, int bits = 8, uint seed = 0, bool benchmark=false)
         {
-            switch (algorithm) {
-                case 1:
-                    RunSampler(new Pach1(bits, seed), bits);
-                    break;
-                case 2:
-                    RunSampler(new Pach2(bits, seed), bits);
-                    break;
-                case 3:
-                    RunSampler(new Pach3(bits, seed), bits);
-                    break;
-                case 4:
-                    RunSampler(new Pach4(bits, seed), bits);
-                    break;
+            ISampler sampler = algorithm switch {
+                1 => new Pach1(bits, seed),
+                2 => new Pach2(bits, seed),
+                3 => new Pach3(bits, seed),
+                4 => new Pach4(bits, seed),
+                _ => throw new ArgumentOutOfRangeException(nameof(algorithm), "algorithm must be between 1 and 4")
+            };
 
-            }
+            if (benchmark)
+                BenchmarkRunner.Run(typeof(Program).Assembly);
+            else
+                RunSampler(sampler, bits);
         }
         
         private static void RunSampler<T>(T sampler, int bits) where T: ISampler
@@ -39,7 +38,6 @@ namespace BlueNoise
             {
                 for (int y = 0; y < gridSize * cellSize; y += cellSize)
                 {
-
                     var sample = sampler[x, y];
 
                     if (sample.Valid )
@@ -47,5 +45,6 @@ namespace BlueNoise
                 }
             }
         }
+        
     }
 }

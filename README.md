@@ -10,14 +10,16 @@ I can place them on a grid making sure that each structure stays in it's assigne
 
 I have not come up with the absolute perfect solution yet, but I present a set of algorithms to solve this problem, each with pros and cons.
 
-[![Pach1](Pach1/example.svg)](Pach1/Pach1.md)
-[Pach1](Pach1/Pach1.md)
+| | Pach1 | Pach2 | Pach3 | Pach4 |
+|-|-------|-------|-------|--------|
+| | <img src="Pach1/example.svg" width="100" height="100"/> | <img src="Pach2/example.svg" width="100" height="100"/> | <img src="Pach3/example.svg" width="100" height="100"/> | <img src="Pach4/example.svg" width="100" height="100"/> |
+| Min Square Distance| <span class="bad">n/2</span> | <span class="good">n</span> | <span class="good">n</span> | <span class="good">n</span> | 
+| Min Euclidean Distance | <span class="bad">n/sqrt(2)</span> | <span class="good">n</span> | <span class="good">n</span> | <span class="good">n</span>|
+| Initialization Benchmark | <span class="good">0.08ns</span> | <span class="good">0.007ns</span> | <span class="good">0.007ns</span> | <span class="bad">6,450,032 ns (6 ms) O(n*n)</span> |
+| 1M samples benchmark | <span class="good">29.51 ms</span> | <span class="bad">70.34 ms</span> | <span class="bad">58.72 ms</span> | <span class="good">14.84 ms</span> |
+| Memory use | <span class="good">8 B</span> | <span class="good">8 B</span> | <span class="good">8 B</span> | <span class="bad">786,432 B O(n*n)</span> |
+| Tiled | <span class="good">No</span> | <span class="good">No</span> | <span class="good">No</span> | <span class="bad">Yes</span> |
 
-[![Pach2](Pach2/example.svg)](Pach2/Pach2.md)
-[Pach2](Pach2/Pach2.md)
-
-[![Pach2](Pach3/example.svg)](Pach3/Pach3.md)
-[Pach2](Pach3/Pach3.md)
 
 ## Shape of objects
 
@@ -64,3 +66,11 @@ But that is not really a goal,  objects should be scattered randomly, not in a g
 
 My ideal algorithm would fill the space in such way that no more objects can be placed. That means that the distance between a point and the nearest point is never more than the size of the squares.  I haven't come up with a way to measure this type of coverage yet.
 
+<style>
+.good{
+    color:green;
+}
+.bad{
+    color:red;
+}
+</style>
