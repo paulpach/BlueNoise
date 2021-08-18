@@ -1,4 +1,4 @@
-# Maximal fill
+# Square Coverage
 
 If we place samples in a grid,  we can easily make sure that all parts of the map are under a square object.
 
@@ -15,3 +15,5 @@ I consider an algorithm to be maximal, if there is no position x,y whose nearest
 Pach2, Pach3 and other future algorithms are not be maximal.  To measure how good the algorithm fills the space,  I calculate how many more additional samples I can place without violating the constraints. 
 
 For example,  In a 30x30 grid, Pach2 was able to find 480 samples. I can place 38 additional samples without violating the constraints,  thus Pach2 found `480 / (38 + 480) = 92%` of the samples.
+
+Yet another way to look at this coverage is to place squares of size `2n * 2n`.  If I cover the entire plane, then the algorithm is maximal.

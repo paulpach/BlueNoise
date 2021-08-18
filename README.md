@@ -6,13 +6,13 @@
 | | <img src="Pach1/example.svg" width="100" height="100"/> | <img src="Pach2/example.svg" width="100" height="100"/> | <img src="Pach3/example.svg" width="100" height="100"/> | <img src="Pach4/example.svg" width="100" height="100"/> |
 | Min [Square Distance](SquareDistance.md)| n/2 :x: | n :white_check_mark: | n :white_check_mark: | n :white_check_mark: | 
 | Min Euclidean Distance | n/sqrt(2) :x: | n :white_check_mark: | n :white_check_mark: | n :white_check_mark:|
-| (Initialization Benchmark)[InitBenchmark.md] | 4.7 ns :white_check_mark: | 4.6 ns :white_check_mark: | 4.7 ns :white_check_mark: | 6 ms O(n*n) :x: |
-| (1M samples benchmark)[1MBenchmark.md] | 29.822 ms :white_check_mark: | 96.02 ms :x: | 61 ms :x: | 9.9 ms :white_check_mark: |
-| (Memory use)[memory.md] | 8 B :white_check_mark: | 8 B :white_check_mark: | 8 B :white_check_mark: | 786,432 B O(n*n) :x: |
-| (Tiled)[Tiles.md] | No :white_check_mark: | No :white_check_mark: | No :white_check_mark: | Yes :x: |
-| (Maximal)[Maximal.md] | 100% :white_check_mark:| 92% :white_check_mark:| 50% :x: | 100% :white_check_mark:|
-| (Randomness)[Randomness.md] | C :x: | A :white_check_mark:| B :x: | A- :white_check_mark:|
-| (Repeatable)[Repeatable.md] | Yes :white_check_mark: | Yes :white_check_mark: | Yes :white_check_mark: | Yes :white_check_mark: |
+| [Initialization Benchmark](InitBenchmark.md) | 4.7 ns :white_check_mark: | 4.6 ns :white_check_mark: | 4.7 ns :white_check_mark: | 6 ms O(n*n) :x: |
+| [1M samples benchmark](1MBenchmark.md) | 29.822 ms :white_check_mark: | 96.02 ms :x: | 61 ms :x: | 9.9 ms :white_check_mark: |
+| [Memory use](memory.md) | 8 B :white_check_mark: | 8 B :white_check_mark: | 8 B :white_check_mark: | 786,432 B O(n*n) :x: |
+| [Tiled](Tiles.md) | No :white_check_mark: | No :white_check_mark: | No :white_check_mark: | Yes :x: |
+| [Square Coverage](Coverage.md) | 100% :white_check_mark:| 92% :white_check_mark:| 50% :x: | 100% :white_check_mark:|
+| [Randomness](Randomness.md) | C :x: | A :white_check_mark:| B :x: | A- :white_check_mark:|
+| [Repeatable](Repeatable.md) | Yes :white_check_mark: | Yes :white_check_mark: | Yes :white_check_mark: | Yes :white_check_mark: |
 
 Here I present 4 algorithms I invented for placing square objects on a plane such that they don't touch each other.  The algorithms are named after me, and all have different pros and cons, which I present in the table above.
 
