@@ -5,35 +5,20 @@
 ## The Good
 
 * Minimum euclidean distance: `n/sqrt(2)`
-* Minimum object distance: `n/2`
+* Maximum distance to closest neighbor: `3n/sqrt(2)`
+* Minimum square distance: `n/2`
+* Maximum Square distance to closest neighbor: `3n/2` 
 * No tiles
 * Infinite
 * Suitable for blue noise sampling?
 * Every cell has a sample
-* O(1) very fast initialization
-* O(1) very fast sampling of any arbitrary cell, no need to evaluate neighbor cells (need to benchmark)
+* O(1) very fast initialization, around 5 ns
+* O(1) very fast sampling, around 30ms for 1 million samples
 
 ## The Bad
 
 * Pattern is too regular for my taste it does not look organic
-* the minimum block distance is relatively small compared to the cell size. That means objects will be placed far appart in the game on average.
-
-## How it works
-
-It is a modification of the algorithm proposed by [Dr. Roberts](http://extremelearning.com.au/isotropic-blue-noise-point-sets/).
-
-Unlike the original algorithm, this does not guarantee 1-D uniform projections.
-
-# How to run it
-
-I wrote it in .Net core,  and provided a sample program to run the algorithm.
-1) clone this repo
-2) install [.net](https://dotnet.microsoft.com/download)
-3) run the sample program
-
-```sh
-dotnet run Program --pach1
-```
+* the minimum block distance is relatively small compared to the maximum distance. That means objects will be placed far appart in the game on average.
 
 # How does it work?
 
@@ -63,7 +48,7 @@ because the difference between 0 and 8 is greater than n/2
 
 I use 2 separate balanced sequences,  one for rows and one for columns.
 
-To evaluate s(i):
+To calculate s(i):
 1. if i is odd,  I simply get a pseudo random number between `[0,n)` using [Squirrel3](https://www.youtube.com/watch?v=LWFzPP8ZbdU).
 2. if i is even:
     1. I get the value of s(i-1) and s(i+1). 
