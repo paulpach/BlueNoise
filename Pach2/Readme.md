@@ -79,24 +79,14 @@ In this case the sample will be placed `(Min(top.y1, top.y2), bottom.x2`)` as lo
 Notice that the samples at the top and bottom of an horizontal EE will be at least n points horizontally with the samples at the left and right. 
 Notice that the samples at the top and bottom of a vertical EE will be at least n points vertically with the samples at the left and right.
 
-Between the EE, EO and OE, we get a lot of non conflicting samples, but we have not placed any samples in OO cells, so that leaves ugly gaps in a very predictable pattern:
+Between the EE, EO and OE, we get a lot of non conflicting samples, but we have not placed any samples in OO cells, so that leaves an ugly grid like shape with holes in the middle:
 
+![No Odd/Odd](no_odd_odd.svg)
 
+## Odd row, odd column (OO)
 
-### Random sampling in valid range
-Finding a sample in this cell that does not conflict with either EE is trivial:  
-1) the sample for the EE cell on the left.
-2) find the sample for the EE on the right.
-3) if left.x <= right.x,  
-    3.1) produce a random x between left.x and right.x
-    3.2) otherwise produce an invalid sample.
+These rows are intuitively simple.  I just calculate all samples in the neighbor 8 cells,  and find a sample that does not conflict with any of them,  if possible. End result:
 
-But this simple algorithm fails to account for the cells on the diagonals, which may produce conflicting samples,  thus this algorithm would not meet my requirements.
+![example](example.svg)
 
-### Shifted sampling
-
-Pach2 has a different algorithm for EO cells.  
-Consider the two EE cells next to it
-
-
-
+Ping me if you can come up with an algorithm to do that simpler than mine.
