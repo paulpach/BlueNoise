@@ -1,7 +1,7 @@
 # Procedural object placement
 
 
-| | Pach1 | Pach2 | Pach3 | Pach4 |
+| | [Pach1](Pach1/Readme.md) | [Pach2](Pach2/Readme.md) | Pach3 | Pach4 |
 |-|-------|-------|-------|--------|
 | | <img src="Pach1/example.svg" width="100" height="100"/> | <img src="Pach2/example.svg" width="100" height="100"/> | <img src="Pach3/example.svg" width="100" height="100"/> | <img src="Pach4/example.svg" width="100" height="100"/> |
 | Min [Square Distance](SquareDistance.md)| n/2 :x: | n :white_check_mark: | n :white_check_mark: | n :white_check_mark: | 
@@ -25,3 +25,27 @@ I can just place random structures in random places in the village,  however thi
 I can place them on a grid making sure that each structure stays in it's assigned cell. But this is not interesting enough for players. The objects should be placed in seemingly random places.
 
 I have not come up with the absolute perfect solution yet although these ones are already good enough for me. 
+
+## Run it:
+
+Pach1
+```sh
+dotnet run -- --algorithm=1
+```
+
+Pach2
+```sh
+dotnet run -- --algorithm=2
+```
+
+Pach3
+```sh
+dotnet run -- --algorithm=3
+```
+
+Pach4
+```sh
+dotnet run -- --algorithm=4
+```
+
+These will generate samples in csv format in 30x30 grid with a cell size of 256

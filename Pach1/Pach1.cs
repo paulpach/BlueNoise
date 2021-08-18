@@ -18,7 +18,6 @@ public readonly struct Pach1 : ISampler
     /// the cell size will be 2 ^ bits
     private readonly int Bits;
 
-
     /// <summary>
     ///   Generates samples with minimum distance
     /// </summary>
