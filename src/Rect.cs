@@ -30,7 +30,7 @@ public struct Rect
     /// <summary>
     /// is this a non empty rectangle?
     /// </summary>
-    public bool Valid => xmax > xmin && ymax > ymin;
+    public bool Valid => xmax >= xmin && ymax >= ymin;
 
     /// <summary>
     /// How many points are covered by this rectangle?

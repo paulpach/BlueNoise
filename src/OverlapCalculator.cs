@@ -39,10 +39,7 @@ public static partial class OverlapCalculator
         Rect result = OcludeLR(lr, ul, ur, left);
         Rect right = r.cutRight(ll.X);
         Rect rightResult = OcludeLR(lr, ul, ur, right);
-        if (rightResult.Area > result.Area)
-            result = rightResult;
-
-        return result;
+        return result.Area > rightResult.Area ? result : rightResult;
     }
 
     private static Rect OcludeLR(Sample lr, Sample ul, Sample ur, Rect r)
@@ -70,9 +67,7 @@ public static partial class OverlapCalculator
         Rect result = OcludeUL(ul, ur, right);
         Rect left = r.cutLeft(lr.X);
         Rect leftResult = OcludeUL(ul, ur, left);
-        if (leftResult.Area > result.Area)
-            result = leftResult;
-        return result;
+        return result.Area > leftResult.Area ? result : leftResult;
     }
 
     private static Rect OcludeUL(Sample ul, Sample ur, Rect r)
@@ -101,9 +96,7 @@ public static partial class OverlapCalculator
         Rect result = OcludeUR(ur, left);
         Rect right = r.cutRight(ul.X);
         Rect rightResult = OcludeUR(ur, right);
-        if (rightResult.Area > result.Area)
-            result = rightResult;
-        return result;
+        return result.Area > rightResult.Area ? result : rightResult;
     }
 
     private static Rect OcludeUR(Sample ur, Rect r)
@@ -129,10 +122,7 @@ public static partial class OverlapCalculator
         Rect result = r.cutRight(ur.X);
         result.ymax = ur.Y;
         Rect leftResult = r.cutLeft(ur.X);
-        if (leftResult.Area > result.Area)
-            result = leftResult;
-
-        return result;
+        return result.Area > leftResult.Area ? result : leftResult;
     }
 
 

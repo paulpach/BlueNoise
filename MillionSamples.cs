@@ -17,6 +17,7 @@ namespace BlueNoise
             yield return new object[] { new Pach2(8,0), 8 };
             yield return new object[] { new Pach3(8,0), 8 };
             yield return new object[] { new Pach4(8,0), 8 };
+            yield return new object[] { new Pach5(8,0), 8 };
         }
 
         /// <summary>

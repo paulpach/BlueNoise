@@ -20,6 +20,7 @@ namespace BlueNoise
                 2 => new Pach2(bits, seed),
                 3 => new Pach3(bits, seed),
                 4 => new Pach4(bits, seed),
+                5 => new Pach5(bits, seed),
                 _ => throw new ArgumentOutOfRangeException(nameof(algorithm), "algorithm must be between 1 and 4")
             };
 

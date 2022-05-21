@@ -29,5 +29,11 @@ namespace BlueNoise
         /// </summary>
         [Benchmark]
         public ISampler pach4() => new Pach4(8, 0);
+
+        /// <summary>
+        /// benchmark pach5
+        /// </summary>
+        [Benchmark]
+        public ISampler pach5() => new Pach5(8, 0);
     }
 }
